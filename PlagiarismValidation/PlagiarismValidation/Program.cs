@@ -22,7 +22,7 @@ namespace PlagiarismValidation
             Dictionary<string, List<Tuple<string, int , int>>> graph = new Dictionary<string, List<Tuple<string, int, int>>>();
             Dictionary<string, int> colored_vertices = new Dictionary<string, int>();
             Dictionary<string, List<string>> componentsLst = new Dictionary<string, List<string>>();
-            ConstructingTheGraph(edges, elements,graph);
+            ConstructingTheGraph(edges, elements, graph, colored_vertices);
             //foreach (var edge in edges)
             //{
             //    // Access individual elements of the tuple
@@ -158,7 +158,7 @@ namespace PlagiarismValidation
             maxScore = avgScore / numberOfEdges;
 
         }
-        public static void ConstructingTheGraph(Tuple<string, string, int, int, int>[] edges, Dictionary<string, List<Tuple<string, int, int, int>>> elements, Dictionary<string, List<Tuple<string, int, int>>> graph)
+        public static void ConstructingTheGraph(Tuple<string, string, int, int, int>[] edges, Dictionary<string, List<Tuple<string, int, int, int>>> elements, Dictionary<string, List<Tuple<string, int, int>>> graph, Dictionary<string, int> colored_vertices)
         {
             int maximum = 0;
             //the first float number is for percentage of doc 1 to doc 2 (form the first vertex to the second vertex) (edge item 3)
@@ -175,6 +175,7 @@ namespace PlagiarismValidation
                 {
                     elements[edge.Item1] = new List<Tuple<string, int, int, int>>() { Tuple.Create(edge.Item2, edge.Item3, edge.Item4, edge.Item5) };
                     graph[edge.Item1] = new List<Tuple<string, int, int>>() { Tuple.Create(edge.Item2, maximum, edge.Item5) };
+                    colored_vertices[edge.Item1] = 0;
                 }
                 if (elements.ContainsKey(edge.Item2))
                 {
@@ -185,6 +186,7 @@ namespace PlagiarismValidation
                 {
                     elements[edge.Item2] = new List<Tuple<string, int, int, int>>() { Tuple.Create(edge.Item1, edge.Item3, edge.Item4, edge.Item5) };
                     graph[edge.Item2] = new List<Tuple<string, int, int>>() { Tuple.Create(edge.Item1, maximum, edge.Item5) };
+                    colored_vertices[edge.Item2] = 0;
                 }
                 
             }

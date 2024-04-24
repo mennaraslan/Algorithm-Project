@@ -12,3 +12,17 @@ D:\Uni Related\Algorithms\Project\MATERIALS\[3] Plagiarism Validation\Algorithm-
 D:\Uni Related\Algorithms\Project\MATERIALS\[3] Plagiarism Validation\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\obj\Debug\PlagiarismValidation.csproj.CopyComplete
 D:\Uni Related\Algorithms\Project\MATERIALS\[3] Plagiarism Validation\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\obj\Debug\PlagiarismValidation.exe
 D:\Uni Related\Algorithms\Project\MATERIALS\[3] Plagiarism Validation\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\obj\Debug\PlagiarismValidation.pdb
+C:\Users\LENOVO\Desktop\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\bin\Debug\PlagiarismValidation.exe.config
+C:\Users\LENOVO\Desktop\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\bin\Debug\PlagiarismValidation.exe
+C:\Users\LENOVO\Desktop\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\bin\Debug\PlagiarismValidation.pdb
+C:\Users\LENOVO\Desktop\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\bin\Debug\ExcelDataReader.DataSet.dll
+C:\Users\LENOVO\Desktop\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\bin\Debug\ExcelDataReader.dll
+C:\Users\LENOVO\Desktop\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\bin\Debug\ExcelDataReader.pdb
+C:\Users\LENOVO\Desktop\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\bin\Debug\ExcelDataReader.xml
+C:\Users\LENOVO\Desktop\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\bin\Debug\ExcelDataReader.DataSet.pdb
+C:\Users\LENOVO\Desktop\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\bin\Debug\ExcelDataReader.DataSet.xml
+C:\Users\LENOVO\Desktop\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\obj\Debug\PlagiarismValidation.csproj.AssemblyReference.cache
+C:\Users\LENOVO\Desktop\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\obj\Debug\PlagiarismValidation.csproj.CoreCompileInputs.cache
+C:\Users\LENOVO\Desktop\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\obj\Debug\PlagiarismValidation.csproj.CopyComplete
+C:\Users\LENOVO\Desktop\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\obj\Debug\PlagiarismValidation.exe
+C:\Users\LENOVO\Desktop\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\obj\Debug\PlagiarismValidation.pdb
