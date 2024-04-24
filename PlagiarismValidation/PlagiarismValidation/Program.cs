@@ -16,10 +16,6 @@ namespace PlagiarismValidation
         {
 
             Tuple<string, string, float, int>[] edges = ReadFromExcelFile();
-            Dictionary<string, List<Tuple<string, float, int>>> elements = new Dictionary<string, List<Tuple<string, float, int>>>();
-            MakeDic(edges, elements);
-
-
             //var edges = new Tuple<string, string, float>[numberOfedges];
 
             //foreach (var edge in edges)
@@ -36,12 +32,11 @@ namespace PlagiarismValidation
 
         }
 
-        public static Tuple<string, string, float, int>[] ReadFromExcelFile()
+        public static Tuple<string, string, int, int, int>[] ReadFromExcelFile()
         {
             string inputfilePath = "D:\\Uni Related\\Algorithms\\Project\\MATERIALS\\[3] Plagiarism Validation\\Algorithm-Project\\PlagiarismValidation\\trial input.xlsx";
             int numberOfEdges;
-            //var edges = new Tuple<string, string, float>[numberOfedges];
-            Tuple<string, string, float, int>[] edges;
+            Tuple<string, string, int, int, int>[] edges;
 
             using (var stream = File.Open(inputfilePath, FileMode.Open, FileAccess.Read))
             {
@@ -61,21 +56,14 @@ namespace PlagiarismValidation
                 string similarityPercentage;
                 string mergedSimilarityPercentage;
                 Match matchPercentage;
-                float percentageDoc1, percentageDoc2;
+                float percentageDoc1 , percentageDoc2;
                 Regex percentageRegex = new Regex(@"\(\d+%\)");
-
-                string[] documentPathArr;
-                string documentPath1 = "";
-                string documentPath2 = "";
-                Regex documentPathRegex = new Regex(@"~(\(\d+%\))");
-                Match matchDocumentPath;
 
                 int linesMatched;
 
                 numberOfEdges = table.Rows.Count - 1;
                 Console.WriteLine(numberOfEdges);
-                edges = new Tuple<string, string, float, int>[numberOfEdges];
-                float percentageToBeRecorded;
+                edges = new Tuple<string, string, int, int, int>[numberOfEdges];
 
                 for (int i = 1; i < table.Rows.Count; i++)
                 {
@@ -85,43 +73,22 @@ namespace PlagiarismValidation
                     column1 = row[0].ToString();
 
                     // Retrieving the similarity percentage of each document in column 1
-                    matchPercentage = percentageRegex.Match(column1); // Output --> (percentage%)
-                    similarityPercentage = matchPercentage.Value;
-                    similarityPercentageArr = similarityPercentage.Split('(', '%');
-                    mergedSimilarityPercentage = string.Join("", similarityPercentageArr);
-                    mergedSimilarityPercentage = mergedSimilarityPercentage.Replace(")", "");
-                    mergedSimilarityPercentage = Regex.Replace(mergedSimilarityPercentage, @"\D", "");
-                    //percentageDoc1 = Convert.ToInt32(mergedSimilarityPercentage);
-                    percentageDoc1 = float.Parse(mergedSimilarityPercentage);
-                    //Console.WriteLine(percentageDoc1);
-
-                    // Retrieving the Document's Path in column 1
-                    documentPath1 = column1.Replace(similarityPercentage, "");
-                    //Console.WriteLine(documentPath1);
+                    int indexOfbrac1 = column1.LastIndexOf('(');
+                    string firstPath = column1.Substring(0, indexOfbrac1);
+                    int firstPercntage = int.Parse(column1.Substring(indexOfbrac1 + 1, column1.Length - (indexOfbrac1 + 3)));
 
                     column2 = row[1].ToString();
 
                     // Retrieving the similarity percentage of each document in column 2
-                    matchPercentage = percentageRegex.Match(column2);
-                    similarityPercentage = matchPercentage.Value;
-                    similarityPercentageArr = similarityPercentage.Split('(', '%');
-                    mergedSimilarityPercentage = string.Join("", similarityPercentageArr);
-                    mergedSimilarityPercentage = mergedSimilarityPercentage.Replace(")", "");
-                    mergedSimilarityPercentage = Regex.Replace(mergedSimilarityPercentage, @"\D", "");
-                    //percentageDoc2 = Convert.ToInt32(mergedSimilarityPercentage);
-                    percentageDoc2 = float.Parse(mergedSimilarityPercentage);
-                    //Console.WriteLine(percentageDoc2);
-
-                    // Retrieving the Document's Path in column 2
-                    documentPath2 = column2.Replace(similarityPercentage, "");
-                    //Console.WriteLine(documentPath2);
+                    int indexOfbrac2 = column2.LastIndexOf('(');
+                    string secondPath = column2.Substring(0, indexOfbrac2);
+                    int secondPercntage = int.Parse(column2.Substring(indexOfbrac2 + 1, column2.Length - (indexOfbrac2 + 3)));
 
                     // Retrieving the Lines Matched in column 3
                     column3 = row[2].ToString();
                     linesMatched = Convert.ToInt32(column3);
-                    //Console.WriteLine(linesMatched);
 
-                    if (percentageDoc1 >= percentageDoc2)
+                    if(percentageDoc1 >= percentageDoc2)
                     {
                         percentageToBeRecorded = percentageDoc1;
                     }
