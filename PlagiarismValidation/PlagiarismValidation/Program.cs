@@ -20,7 +20,9 @@ namespace PlagiarismValidation
 
             Dictionary < string, List < Tuple < string, int , int, int>>> elements = new Dictionary<string, List<Tuple<string, int, int, int>>>();
             ConstructingTheGraph(edges, elements);
-
+            Dictionary<string, List<Tuple<string, int, int , int>>> elements = new Dictionary<string, List<Tuple<string, int, int, int>>>();
+            Dictionary<string, int> colored_vertices = new Dictionary<string, int>();
+            Dictionary<string, List<string>> componentsLst = new Dictionary<string, List<string>>();
             //foreach (var edge in edges)
             //{
             //    // Access individual elements of the tuple
@@ -32,6 +34,21 @@ namespace PlagiarismValidation
             //    // Print the elements
             //    Console.WriteLine($"Doc 1: {element1}, Doc 2: {element2}, Percentage: {element3}, Lines Matched: {element4}");
             //}
+            int numberOfEdges = 0;
+            float maxScore = 0;
+
+            foreach (var vertex in elements) // V  
+            {
+                maxScore = 0;
+
+                if (colored_vertices[vertex.Key] == 0) 
+                {
+                    List<string> component = new List<string>();
+
+                    BFS(vertex.Key, ref elements, ref colored_vertices, ref component, ref numberOfEdges, ref maxScore); // V / 2 + E
+                    componentsLst.Add(vertex.Key, component);
+                }
+            }
 
         }
 
@@ -40,6 +57,7 @@ namespace PlagiarismValidation
             string inputfilePath = "D:\\Uni Related\\Algorithms\\Project\\MATERIALS\\[3] Plagiarism Validation\\Algorithm-Project\\PlagiarismValidation\\trial input.xlsx";
             int numberOfEdges;
             Tuple<string, string, int, int, int>[] edges;
+            
 
             using (var stream = File.Open(inputfilePath, FileMode.Open, FileAccess.Read))
             {
@@ -100,6 +118,46 @@ namespace PlagiarismValidation
             return edges;
         }
 
+        public static void BFS(string vertex, ref Dictionary<string, List<Tuple<string, int, int, int>>> graphDictionary, ref Dictionary<string, int> colored_vertices, ref List<string> component, ref int numberOfEdges, ref float maxScore)
+        {
+            colored_vertices[vertex] = 1;
+            Queue<string> bfsQueue = new Queue<string>();
+
+            float avgScore = 0;
+            bfsQueue.Enqueue(vertex);
+            component.Add(vertex);
+
+            numberOfEdges = 0;
+            while (bfsQueue.Count != 0)
+            {
+                string newVertex = bfsQueue.Dequeue();
+                List<Tuple<string, int, int, int>> adjacencyList = graphDictionary[newVertex];
+                foreach (var vertexTuple in adjacencyList)
+                {
+                    numberOfEdges++;
+                    if (colored_vertices[vertexTuple.Item1] == 0)  // White
+                    {
+
+                        colored_vertices[vertexTuple.Item1] = 1; // Gray
+                        component.Add(vertexTuple.Item1);
+                        avgScore += vertexTuple.Item2;
+                        bfsQueue.Enqueue(vertexTuple.Item1);
+
+                    }
+
+                    else if (colored_vertices[vertexTuple.Item1] == 1)
+                    {
+
+                        avgScore += vertexTuple.Item2;
+                    }
+                }
+
+                colored_vertices[newVertex] = 2; // Black
+
+            }
+            maxScore = avgScore / numberOfEdges;
+
+        }
         public static void ConstructingTheGraph(Tuple<string, string, int, int, int>[] edges, Dictionary<string, List<Tuple<string, int, int, int>>> elements)
         {
 
