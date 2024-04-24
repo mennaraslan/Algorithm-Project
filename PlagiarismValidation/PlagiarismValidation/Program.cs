@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,8 +15,11 @@ namespace PlagiarismValidation
         static void Main(string[] args)
         {
 
-            Tuple<string, string, float, int>[] edges = ReadFromExcelFile();
-            //var edges = new Tuple<string, string, float>[numberOfedges];
+
+            Tuple<string, string, int, int, int>[] edges = ReadFromExcelFile();
+
+            Dictionary<string, List<Tuple<string, float, int>>> elements = new Dictionary<string, List<Tuple<string, float, int>>>();
+            //MakeDic(edges, elements);
 
             //foreach (var edge in edges)
             //{
@@ -52,12 +55,7 @@ namespace PlagiarismValidation
                 string column2 = "";
                 string column3 = "";
 
-                string[] similarityPercentageArr;
-                string similarityPercentage;
-                string mergedSimilarityPercentage;
-                Match matchPercentage;
-                float percentageDoc1 , percentageDoc2;
-                Regex percentageRegex = new Regex(@"\(\d+%\)");
+
 
                 int linesMatched;
 
@@ -88,15 +86,8 @@ namespace PlagiarismValidation
                     column3 = row[2].ToString();
                     linesMatched = Convert.ToInt32(column3);
 
-                    if(percentageDoc1 >= percentageDoc2)
-                    {
-                        percentageToBeRecorded = percentageDoc1;
-                    }
-                    else
-                    {
-                        percentageToBeRecorded = percentageDoc2;
-                    }
-                    edges[i - 1] = new Tuple<string, string, float, int>(documentPath1, documentPath2, percentageToBeRecorded, linesMatched);
+                    edges[i - 1] = new Tuple<string, string, int, int, int>(firstPath, secondPath, firstPercntage, secondPercntage, linesMatched);
+
                 }
 
                 if (reader != null)
@@ -138,3 +129,4 @@ namespace PlagiarismValidation
         }
     }
 }
+
