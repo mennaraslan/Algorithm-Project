@@ -15,19 +15,20 @@ namespace PlagiarismValidation
         static void Main(string[] args)
         {
 
-            Tuple<string, string, int, int, int>[] edges = ReadFromExcelFile();
+            Tuple<string, string, float, int>[] edges = ReadFromExcelFile();
+            //var edges = new Tuple<string, string, float>[numberOfedges];
 
-            foreach (var edge in edges)
-            {
-                // Access individual elements of the tuple
-                string element1 = edge.Item1;
-                string element2 = edge.Item2;
-                float element3 = edge.Item3;
-                int element4 = edge.Item4;
+            //foreach (var edge in edges)
+            //{
+            //    // Access individual elements of the tuple
+            //    string element1 = edge.Item1;
+            //    string element2 = edge.Item2;
+            //    float element3 = edge.Item3;
+            //    int element4 = edge.Item4;
 
-                // Print the elements
-                Console.WriteLine($"Doc 1: {element1}, Doc 2: {element2}, Percentage: {element3}, Lines Matched: {element4}");
-            }
+            //    // Print the elements
+            //    Console.WriteLine($"Doc 1: {element1}, Doc 2: {element2}, Percentage: {element3}, Lines Matched: {element4}");
+            //}
 
         }
 
@@ -51,6 +52,12 @@ namespace PlagiarismValidation
                 string column2 = "";
                 string column3 = "";
 
+                string[] similarityPercentageArr;
+                string similarityPercentage;
+                string mergedSimilarityPercentage;
+                Match matchPercentage;
+                float percentageDoc1 , percentageDoc2;
+                Regex percentageRegex = new Regex(@"\(\d+%\)");
 
                 int linesMatched;
 
@@ -60,7 +67,7 @@ namespace PlagiarismValidation
 
                 for (int i = 1; i < table.Rows.Count; i++)
                 {
-                        
+
                     DataRow row = table.Rows[i];
 
                     column1 = row[0].ToString();
@@ -81,7 +88,15 @@ namespace PlagiarismValidation
                     column3 = row[2].ToString();
                     linesMatched = Convert.ToInt32(column3);
 
-                    edges[i - 1] = new Tuple<string, string, int, int, int>(firstPath, secondPath, firstPercntage, secondPercntage, linesMatched);
+                    if(percentageDoc1 >= percentageDoc2)
+                    {
+                        percentageToBeRecorded = percentageDoc1;
+                    }
+                    else
+                    {
+                        percentageToBeRecorded = percentageDoc2;
+                    }
+                    edges[i - 1] = new Tuple<string, string, float, int>(documentPath1, documentPath2, percentageToBeRecorded, linesMatched);
                 }
 
                 if (reader != null)
@@ -92,6 +107,34 @@ namespace PlagiarismValidation
 
             }
             return edges;
+        }
+
+        public static void MakeDic(Tuple<string, string, float, int>[] edges, Dictionary<string, List<Tuple<string, float, int>>> elements)
+        {
+            foreach (var edge in edges)
+            {
+                if (elements.ContainsKey(edge.Item1))
+                {
+                    elements[edge.Item1].Add(Tuple.Create(edge.Item2, edge.Item3, edge.Item4));
+                }
+                else
+                {
+                    elements[edge.Item1] = new List<Tuple<string, float, int>>() { Tuple.Create(edge.Item2, edge.Item3, edge.Item4) };
+                }
+                if (elements.ContainsKey(edge.Item2))
+                {
+                    elements[edge.Item2].Add(Tuple.Create(edge.Item1, edge.Item3, edge.Item4));
+                }
+                else
+                {
+                    elements[edge.Item2] = new List<Tuple<string, float, int>>() { Tuple.Create(edge.Item1, edge.Item3, edge.Item4) };
+                }
+            }
+        }
+
+        public static void Output()
+        {
+
         }
     }
 }
