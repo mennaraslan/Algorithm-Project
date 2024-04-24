@@ -18,8 +18,8 @@ namespace PlagiarismValidation
 
             Tuple<string, string, int, int, int>[] edges = ReadFromExcelFile();
 
-            Dictionary<string, List<Tuple<string, float, int>>> elements = new Dictionary<string, List<Tuple<string, float, int>>>();
-            //MakeDic(edges, elements);
+            Dictionary < string, List < Tuple < string, int , int, int>>> elements = new Dictionary<string, List<Tuple<string, int, int, int>>>();
+            ConstructingTheGraph(edges, elements);
 
             //foreach (var edge in edges)
             //{
@@ -100,25 +100,28 @@ namespace PlagiarismValidation
             return edges;
         }
 
-        public static void MakeDic(Tuple<string, string, float, int>[] edges, Dictionary<string, List<Tuple<string, float, int>>> elements)
+        public static void ConstructingTheGraph(Tuple<string, string, int, int, int>[] edges, Dictionary<string, List<Tuple<string, int, int, int>>> elements)
         {
+
+            //the first float number is for percentage of doc 1 to doc 2 (form the first vertex to the second vertex) (edge item 3)
+            //the second float number is for percentage of doc 2 to doc 1 (form the second vertex to the first vertex) (edge item 4)
             foreach (var edge in edges)
             {
                 if (elements.ContainsKey(edge.Item1))
                 {
-                    elements[edge.Item1].Add(Tuple.Create(edge.Item2, edge.Item3, edge.Item4));
+                    elements[edge.Item1].Add(Tuple.Create(edge.Item2, edge.Item3, edge.Item4, edge.Item5));
                 }
                 else
                 {
-                    elements[edge.Item1] = new List<Tuple<string, float, int>>() { Tuple.Create(edge.Item2, edge.Item3, edge.Item4) };
+                    elements[edge.Item1] = new List<Tuple<string, int, int, int>>() { Tuple.Create(edge.Item2, edge.Item3, edge.Item4, edge.Item5) };
                 }
                 if (elements.ContainsKey(edge.Item2))
                 {
-                    elements[edge.Item2].Add(Tuple.Create(edge.Item1, edge.Item3, edge.Item4));
+                    elements[edge.Item2].Add(Tuple.Create(edge.Item1, edge.Item3, edge.Item4, edge.Item5));
                 }
                 else
                 {
-                    elements[edge.Item2] = new List<Tuple<string, float, int>>() { Tuple.Create(edge.Item1, edge.Item3, edge.Item4) };
+                    elements[edge.Item2] = new List<Tuple<string, int, int, int>>() { Tuple.Create(edge.Item1, edge.Item3, edge.Item4, edge.Item5) };
                 }
             }
         }
