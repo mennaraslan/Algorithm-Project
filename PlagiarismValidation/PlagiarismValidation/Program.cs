@@ -14,34 +14,20 @@ namespace PlagiarismValidation
     {
         static void Main(string[] args)
         {
-
-            Tuple<string, string, float, int>[] edges = ReadFromExcelFile();
-            Dictionary<string, List<Tuple<string, float, int>>> elements = new Dictionary<string, List<Tuple<string, float, int>>>();
-            MakeDic(edges, elements);
-
-
-            //var edges = new Tuple<string, string, float>[numberOfedges];
-
-            //foreach (var edge in edges)
-            //{
-            //    // Access individual elements of the tuple
-            //    string element1 = edge.Item1;
-            //    string element2 = edge.Item2;
-            //    float element3 = edge.Item3;
-            //    int element4 = edge.Item4;
-
-            //    // Print the elements
-            //    Console.WriteLine($"Doc 1: {element1}, Doc 2: {element2}, Percentage: {element3}, Lines Matched: {element4}");
-            //}
+            //string file_path;
+            
+            Tuple<string, string, int, int, int>[] edges = ReadFromExcelFile();
+            Dictionary<string, List<Tuple<string, float, float, int>>> elements = new Dictionary<string, List<Tuple<string, int, int, int>>>();
+            ConstructingTheGraph(edges, elements);
 
         }
 
-        public static Tuple<string, string, float, int>[] ReadFromExcelFile()
+        public static Tuple<string, string, int,int, int>[] ReadFromExcelFile()
         {
             string inputfilePath = "D:\\Uni Related\\Algorithms\\Project\\MATERIALS\\[3] Plagiarism Validation\\Algorithm-Project\\PlagiarismValidation\\trial input.xlsx";
             int numberOfEdges;
             //var edges = new Tuple<string, string, float>[numberOfedges];
-            Tuple<string, string, float, int>[] edges;
+            Tuple<string, string, float, float, int> [] edges;
 
             using (var stream = File.Open(inputfilePath, FileMode.Open, FileAccess.Read))
             {
@@ -61,21 +47,21 @@ namespace PlagiarismValidation
                 string similarityPercentage;
                 string mergedSimilarityPercentage;
                 Match matchPercentage;
-                float percentageDoc1, percentageDoc2;
+                int percentageDoc1, percentageDoc2;
                 Regex percentageRegex = new Regex(@"\(\d+%\)");
 
-                string[] documentPathArr;
+                //string[] documentPathArr;
                 string documentPath1 = "";
                 string documentPath2 = "";
                 Regex documentPathRegex = new Regex(@"~(\(\d+%\))");
-                Match matchDocumentPath;
+                //Match matchDocumentPath;
 
                 int linesMatched;
 
                 numberOfEdges = table.Rows.Count - 1;
                 Console.WriteLine(numberOfEdges);
-                edges = new Tuple<string, string, float, int>[numberOfEdges];
-                float percentageToBeRecorded;
+                edges = new Tuple<string, string, int, int, int>[numberOfEdges];
+                int percentageToBeRecorded1, percentageToBeRecorded2;
 
                 for (int i = 1; i < table.Rows.Count; i++)
                 {
@@ -92,7 +78,7 @@ namespace PlagiarismValidation
                     mergedSimilarityPercentage = mergedSimilarityPercentage.Replace(")", "");
                     mergedSimilarityPercentage = Regex.Replace(mergedSimilarityPercentage, @"\D", "");
                     //percentageDoc1 = Convert.ToInt32(mergedSimilarityPercentage);
-                    percentageDoc1 = float.Parse(mergedSimilarityPercentage);
+                    percentageDoc1 = int.Parse(mergedSimilarityPercentage);
                     //Console.WriteLine(percentageDoc1);
 
                     // Retrieving the Document's Path in column 1
@@ -109,7 +95,7 @@ namespace PlagiarismValidation
                     mergedSimilarityPercentage = mergedSimilarityPercentage.Replace(")", "");
                     mergedSimilarityPercentage = Regex.Replace(mergedSimilarityPercentage, @"\D", "");
                     //percentageDoc2 = Convert.ToInt32(mergedSimilarityPercentage);
-                    percentageDoc2 = float.Parse(mergedSimilarityPercentage);
+                    percentageDoc2 = int.Parse(mergedSimilarityPercentage);
                     //Console.WriteLine(percentageDoc2);
 
                     // Retrieving the Document's Path in column 2
@@ -120,16 +106,17 @@ namespace PlagiarismValidation
                     column3 = row[2].ToString();
                     linesMatched = Convert.ToInt32(column3);
                     //Console.WriteLine(linesMatched);
-
-                    if (percentageDoc1 >= percentageDoc2)
+                    percentageToBeRecorded1 = percentageDoc1;
+                    percentageToBeRecorded2 = percentageDoc2;
+                    /*if (percentageDoc1 >= percentageDoc2)
                     {
                         percentageToBeRecorded = percentageDoc1;
                     }
                     else
                     {
                         percentageToBeRecorded = percentageDoc2;
-                    }
-                    edges[i - 1] = new Tuple<string, string, float, int>(documentPath1, documentPath2, percentageToBeRecorded, linesMatched);
+                    }*/
+                    edges[i - 1] = new Tuple<string, string, int,int, int>(documentPath1, documentPath2, percentageToBeRecorded1,percentageToBeRecorded2, linesMatched);
                 }
 
                 if (reader != null)
@@ -142,25 +129,28 @@ namespace PlagiarismValidation
             return edges;
         }
 
-        public static void MakeDic(Tuple<string, string, float, int>[] edges, Dictionary<string, List<Tuple<string, float, int>>> elements)
+        public static void ConstructingTheGraph(Tuple<string, string, float, float, int>[] edges, Dictionary<string, List<Tuple<string, float, float, int>>> elements)
         {
+
+            //the first float number is for percentage of doc 1 to doc 2 (form the first vertex to the second vertex) (edge item 3)
+            //the second float number is for percentage of doc 2 to doc 1 (form the second vertex to the first vertex) (edge item 4)
             foreach (var edge in edges)
             {
                 if (elements.ContainsKey(edge.Item1))
                 {
-                    elements[edge.Item1].Add(Tuple.Create(edge.Item2, edge.Item3, edge.Item4));
+                    elements[edge.Item1].Add(Tuple.Create(edge.Item2, edge.Item3, edge.Item4, edge.Item5));
                 }
                 else
                 {
-                    elements[edge.Item1] = new List<Tuple<string, float, int>>() { Tuple.Create(edge.Item2, edge.Item3, edge.Item4) };
+                    elements[edge.Item1] = new List<Tuple<string, float, float, int>>() { Tuple.Create(edge.Item2, edge.Item3, edge.Item4, edge.Item5) };
                 }
                 if (elements.ContainsKey(edge.Item2))
                 {
-                    elements[edge.Item2].Add(Tuple.Create(edge.Item1, edge.Item3, edge.Item4));
+                    elements[edge.Item2].Add(Tuple.Create(edge.Item1, edge.Item3, edge.Item4, edge.Item5));
                 }
                 else
                 {
-                    elements[edge.Item2] = new List<Tuple<string, float, int>>() { Tuple.Create(edge.Item1, edge.Item3, edge.Item4) };
+                    elements[edge.Item2] = new List<Tuple<string, float, float, int>>() { Tuple.Create(edge.Item1, edge.Item3, edge.Item4, edge.Item5) };
                 }
             }
         }
