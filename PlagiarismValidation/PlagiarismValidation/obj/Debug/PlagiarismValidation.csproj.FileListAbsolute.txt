@@ -26,3 +26,17 @@ C:\Users\LENOVO\Desktop\Algorithm-Project\PlagiarismValidation\PlagiarismValidat
 C:\Users\LENOVO\Desktop\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\obj\Debug\PlagiarismValidation.csproj.CopyComplete
 C:\Users\LENOVO\Desktop\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\obj\Debug\PlagiarismValidation.exe
 C:\Users\LENOVO\Desktop\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\obj\Debug\PlagiarismValidation.pdb
+F:\Year 3 2nd term\Analysis and Design of Algorithm\Project\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\bin\Debug\PlagiarismValidation.exe.config
+F:\Year 3 2nd term\Analysis and Design of Algorithm\Project\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\bin\Debug\PlagiarismValidation.exe
+F:\Year 3 2nd term\Analysis and Design of Algorithm\Project\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\bin\Debug\PlagiarismValidation.pdb
+F:\Year 3 2nd term\Analysis and Design of Algorithm\Project\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\bin\Debug\ExcelDataReader.DataSet.dll
+F:\Year 3 2nd term\Analysis and Design of Algorithm\Project\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\bin\Debug\ExcelDataReader.dll
+F:\Year 3 2nd term\Analysis and Design of Algorithm\Project\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\bin\Debug\ExcelDataReader.pdb
+F:\Year 3 2nd term\Analysis and Design of Algorithm\Project\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\bin\Debug\ExcelDataReader.xml
+F:\Year 3 2nd term\Analysis and Design of Algorithm\Project\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\bin\Debug\ExcelDataReader.DataSet.pdb
+F:\Year 3 2nd term\Analysis and Design of Algorithm\Project\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\bin\Debug\ExcelDataReader.DataSet.xml
+F:\Year 3 2nd term\Analysis and Design of Algorithm\Project\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\obj\Debug\PlagiarismValidation.csproj.AssemblyReference.cache
+F:\Year 3 2nd term\Analysis and Design of Algorithm\Project\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\obj\Debug\PlagiarismValidation.csproj.CoreCompileInputs.cache
+F:\Year 3 2nd term\Analysis and Design of Algorithm\Project\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\obj\Debug\Plagiari.5B3C7EF5.Up2Date
+F:\Year 3 2nd term\Analysis and Design of Algorithm\Project\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\obj\Debug\PlagiarismValidation.exe
+F:\Year 3 2nd term\Analysis and Design of Algorithm\Project\Algorithm-Project\PlagiarismValidation\PlagiarismValidation\obj\Debug\PlagiarismValidation.pdb

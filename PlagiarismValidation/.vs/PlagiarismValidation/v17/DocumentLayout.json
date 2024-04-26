@@ -5,6 +5,10 @@
     {
       "AbsoluteMoniker": "D:0:0:{CC5D605E-CCC3-45A9-8556-6AA4BD5AF28F}|PlagiarismValidation\\PlagiarismValidation.csproj|f:\\year 3 2nd term\\analysis and design of algorithm\\project\\algorithm-project\\plagiarismvalidation\\plagiarismvalidation\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{CC5D605E-CCC3-45A9-8556-6AA4BD5AF28F}|PlagiarismValidation\\PlagiarismValidation.csproj|solutionrelative:plagiarismvalidation\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CC5D605E-CCC3-45A9-8556-6AA4BD5AF28F}|PlagiarismValidation\\PlagiarismValidation.csproj|F:\\Year 3 2nd term\\Analysis and Design of Algorithm\\Project\\Algorithm-Project\\PlagiarismValidation\\plagiarismvalidation\\setswitharray.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CC5D605E-CCC3-45A9-8556-6AA4BD5AF28F}|PlagiarismValidation\\PlagiarismValidation.csproj|solutionrelative:plagiarismvalidation\\setswitharray.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,11 +18,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "SetsWithArray.cs",
+              "DocumentMoniker": "F:\\Year 3 2nd term\\Analysis and Design of Algorithm\\Project\\Algorithm-Project\\PlagiarismValidation\\PlagiarismValidation\\SetsWithArray.cs",
+              "RelativeDocumentMoniker": "PlagiarismValidation\\SetsWithArray.cs",
+              "ToolTip": "F:\\Year 3 2nd term\\Analysis and Design of Algorithm\\Project\\Algorithm-Project\\PlagiarismValidation\\PlagiarismValidation\\SetsWithArray.cs",
+              "RelativeToolTip": "PlagiarismValidation\\SetsWithArray.cs",
+              "ViewState": "AQIAABIAAAAAAAAAAAAYwB0AAAA5AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-26T08:31:16.13Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -28,7 +45,7 @@
               "RelativeDocumentMoniker": "PlagiarismValidation\\Program.cs",
               "ToolTip": "F:\\Year 3 2nd term\\Analysis and Design of Algorithm\\Project\\Algorithm-Project\\PlagiarismValidation\\PlagiarismValidation\\Program.cs",
               "RelativeToolTip": "PlagiarismValidation\\Program.cs",
-              "ViewState": "AQIAACIAAAAAAAAAAADwv7EAAAARAAAA",
+              "ViewState": "AQIAAHYAAAAAAAAAAAAiwIcAAAAvAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-04-24T19:49:29.333Z",
               "EditorCaption": ""
