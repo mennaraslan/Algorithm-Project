@@ -27,9 +27,10 @@ namespace PlagiarismValidation
 
         public void Union_Set(int u, int v)
         {
+            int cluster = this.members[u];
             for (int i = 0; i < this.members.Length; i++)
             {
-                if (this.members[i] == this.members[u])
+                if (this.members[i] == cluster)
                 {
                     this.members[i] = this.members[v];
                 }
