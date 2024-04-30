@@ -8,7 +8,7 @@ using System.IO;
 using ExcelDataReader;
 using System.Text.RegularExpressions;
 using System.ComponentModel;
-
+using OfficeOpenXml;
 
 namespace PlagiarismValidation
 {
@@ -63,6 +63,8 @@ namespace PlagiarismValidation
                     Console.WriteLine($"Key: {key.Key}, Value: {key.Value}, Int Value: {value}");
                 }
             }
+
+            OutPut_Of_Stat(ref firstVandAvg, ref componentsLst);
 
         }
 
@@ -125,13 +127,13 @@ namespace PlagiarismValidation
 
             }
             componentAVG = avgScore / numberOfEdges;
-            //float number = 123.4567f; // Example floating-point number
             componentAVG = (float)Math.Round(componentAVG, 1);
 
         }
         public static Tuple<string, string, int, int, int>[] ReadFromExcelFile()
         {
-            string inputfilePath = "F:\\Year 3 2nd term\\Analysis and Design of Algorithm\\Project\\Algorithm-Project\\PlagiarismValidation\\Test Cases\\Sample\\5-Input.xlsx";
+            string inputfilePath = "D:\\Uni Related\\Algorithms\\Project\\MATERIALS\\[3] Plagiarism Validation\\Algorithm-Project\\PlagiarismValidation\\Test Cases\\Sample\\6-Input.xlsx";
+            //string inputfilePath = "F:\\Year 3 2nd term\\Analysis and Design of Algorithm\\Project\\Algorithm-Project\\PlagiarismValidation\\Test Cases\\Sample\\5-Input.xlsx";
             int numberOfEdges;
             Tuple<string, string, int, int, int>[] edges;
 
@@ -258,8 +260,52 @@ namespace PlagiarismValidation
         {
 
         }
-        public static void OutPut_Of_Stat()
+        public static void OutPut_Of_Stat(ref Dictionary<string, float> firstVandAvg, ref Dictionary<string, List<string>> componentsLst)
         {
+            ExcelPackage excelPackage = new ExcelPackage();
+
+            ExcelWorksheet statisticsSheet = excelPackage.Workbook.Worksheets.Add("Statistics 1");
+
+            statisticsSheet.Cells["A1"].Value = "Component Index";
+            statisticsSheet.Cells["B1"].Value = "Vertices";
+            statisticsSheet.Cells["C1"].Value = "Average Similarity";
+            statisticsSheet.Cells["D1"].Value = "Component Count";
+
+            Dictionary<string, float> sortedFirstVandAvg = firstVandAvg.OrderByDescending(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
+
+            int i = 0;
+            int counter = 1;
+            foreach(var vertex in sortedFirstVandAvg)
+            {
+                statisticsSheet.Cells[i + 1, 1].Value = counter;
+                statisticsSheet.Cells[i + 1, 3].Value = vertex.Value;
+                List<string> component = componentsLst[vertex.Key];
+                //component.Sort();
+                // +d
+                List<int> componentItemsList = new List<int>();
+                Regex digitsRegex = new Regex("\\d+");
+                string componentItems = "";
+                // matchPercentage = percentageRegex.Match(column1);
+
+                foreach (var item in component)
+                {
+                    Match digitsRegexMatch = digitsRegex.Match(item);
+                    //Console.WriteLine(digitsRegexMatch.Value);
+                    componentItemsList.Add(Convert.ToInt32(digitsRegexMatch.Value));
+                    componentItemsList.Sort();
+                    componentItems = componentItems + digitsRegexMatch.Value + ",";
+                    //
+                }
+                componentItems.Remove(componentItems.Length - 1);
+                statisticsSheet.Cells[i + 1, 2].Value = componentItems;
+                statisticsSheet.Cells[i + 1, 4].Value = component.Count;
+                i++;
+                counter++;
+            }
+
+            string outputFilePath = @"D:\Uni Related\Algorithms\Project\MATERIALS\[3] Plagiarism Validation\Algorithm-Project\PlagiarismValidation\Output\File.xlsx";
+            excelPackage.SaveAs(new System.IO.FileInfo(outputFilePath));
+
 
         }
     }
