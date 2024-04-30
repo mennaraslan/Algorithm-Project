@@ -254,7 +254,11 @@ namespace PlagiarismValidation
                 }
             }
         }
-        public static void Output(Dictionary<string, float> firstVandAvg , Dictionary<string, List<Tuple<string, Tuple<int, int>>>> refinedGroups)
+        public static void OutPut_Of_MST()
+        {
+
+        }
+        public static void OutPut_Of_Stat()
         {
 
         }
