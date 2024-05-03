@@ -275,27 +275,36 @@ namespace PlagiarismValidation
 
             int i = 0;
             int counter = 1;
-            foreach(var vertex in sortedFirstVandAvg)
+            // O(Components log(Components) + componentItems Log(componentItems))
+            
+            foreach (var vertex in sortedFirstVandAvg) // --> no of component --> worst case V/2 -- Best Case --> 1 time 
             {
                 statisticsSheet.Cells[i + 1, 1].Value = counter;
                 statisticsSheet.Cells[i + 1, 3].Value = vertex.Value;
                 List<string> component = componentsLst[vertex.Key];
-                //component.Sort();
+
+                component.Sort(); // O(vlogv)
                 // +d
                 List<int> componentItemsList = new List<int>();
                 Regex digitsRegex = new Regex("\\d+");
                 string componentItems = "";
                 // matchPercentage = percentageRegex.Match(column1);
 
-                foreach (var item in component)
+                foreach (var item in component) // O(V)
                 {
                     Match digitsRegexMatch = digitsRegex.Match(item);
                     //Console.WriteLine(digitsRegexMatch.Value);
                     componentItemsList.Add(Convert.ToInt32(digitsRegexMatch.Value));
-                    componentItemsList.Sort();
-                    componentItems = componentItems + digitsRegexMatch.Value + ",";
+                    
+                    //componentItems = componentItems + digitsRegexMatch.Value + ",";
                     //
                 }
+                componentItemsList.Sort(); // O(vlogv)
+                foreach (var item in componentItemsList) // O(V)
+                {
+                    componentItems = componentItems + item.ToString() + ",";
+                }
+                //componentItemsList.Sort();
                 componentItems.Remove(componentItems.Length - 1);
                 statisticsSheet.Cells[i + 1, 2].Value = componentItems;
                 statisticsSheet.Cells[i + 1, 4].Value = component.Count;
