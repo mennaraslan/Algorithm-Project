@@ -9,6 +9,9 @@ using ExcelDataReader;
 using System.Text.RegularExpressions;
 using System.ComponentModel;
 using OfficeOpenXml;
+using System.Collections;
+using OfficeOpenXml.Style;
+using OfficeOpenXml.Table;
 
 namespace PlagiarismValidation
 {
@@ -16,16 +19,14 @@ namespace PlagiarismValidation
     {
         static void Main(string[] args)
         {
-
-            
-
+            Dictionary<string,string> edge_with_its_hyper_link = new Dictionary<string,string>();
             Tuple<string, string, int, int, int>[] edges = ReadFromExcelFile();
             Dictionary<KeyValuePair<string, string>, Tuple<int, int>> allEdges = new Dictionary<KeyValuePair<string, string>, Tuple<int, int>>();
             Dictionary<string, List<Tuple<string, int, int, int>>> elements = new Dictionary<string, List<Tuple<string, int, int, int>>>(); // edges with two values
             Dictionary<string, int> colored_vertices = new Dictionary<string, int>();//for BFS
             Dictionary<string, List<string>> componentsLst = new Dictionary<string, List<string>>(); //groups
-            Dictionary<string, float> firstVandAvg = new Dictionary<string, float>(); // statistics
-
+            //Dictionary<string, float> firstVandAvg = new Dictionary<string, float>(); // statistics
+            Dictionary<string, Tuple<float,int>> firstVandAvg = new Dictionary<string, Tuple<float, int>>();
             List<Dictionary<KeyValuePair<string, string>, Tuple<int, int>>> Components = new List<Dictionary<KeyValuePair<string, string>, Tuple<int, int>>>();
             List<Dictionary<KeyValuePair<string, string>, Tuple<int, int>>> refinedGroups = new List<Dictionary<KeyValuePair<string, string>, Tuple<int, int>>>();
 
@@ -33,6 +34,7 @@ namespace PlagiarismValidation
 
             int numberOfEdges = 0;
             float componentAVG = 0;
+            int list_index = 0;
 
             foreach (var vertex in elements) // V  
             {
@@ -45,14 +47,18 @@ namespace PlagiarismValidation
                     BFS(vertex.Key, ref elements, ref colored_vertices, ref component, ref numberOfEdges, ref componentAVG, ref edges_of_components); // V / 2 + E
                     componentsLst.Add(vertex.Key, component);
                     Components.Add(edges_of_components);
-                    firstVandAvg.Add(vertex.Key, componentAVG);
+                    Tuple<float, int> tuple = new Tuple<float, int>(componentAVG, list_index);
+                    firstVandAvg.Add(vertex.Key, tuple);
+                    list_index++;
                 }
             }
-            foreach (Dictionary<KeyValuePair<string, string>, Tuple<int, int>> component in Components)
+            firstVandAvg = firstVandAvg.OrderByDescending(pair => pair.Value.Item1).ToDictionary(pair => pair.Key, pair => pair.Value);
+            foreach (string firstString in firstVandAvg.Keys)
             {
+
                 //Dictionary<KeyValuePair<string, string>, int> sortedcomponent = component.OrderByDescending(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value); //nlog(n)
                 Dictionary<KeyValuePair<string, string>, Tuple<int, int>> refinedcompnent = new Dictionary<KeyValuePair<string, string>, Tuple<int, int>>();
-                Kruskal(component, ref refinedcompnent);
+                Kruskal(Components[firstVandAvg[firstString].Item2], ref refinedcompnent);
                 refinedGroups.Add(refinedcompnent);
             }
             foreach (var group in refinedGroups)
@@ -139,7 +145,7 @@ namespace PlagiarismValidation
         public static Tuple<string, string, int, int, int>[] ReadFromExcelFile()
         {
             //string inputfilePath = "D:\\Uni Related\\Algorithms\\Project\\MATERIALS\\[3] Plagiarism Validation\\Algorithm-Project\\PlagiarismValidation\\Test Cases\\Sample\\6-Input.xlsx";
-            string inputfilePath = "F:\\Year 3 2nd term\\Analysis and Design of Algorithm\\Project\\Algorithm-Project\\PlagiarismValidation\\Test Cases\\Sample\\6-Input.xlsx";
+            string inputfilePath = "F:\\Year 3 2nd term\\Analysis and Design of Algorithm\\Project\\Algorithm-Project\\PlagiarismValidation\\Test Cases\\Complete\\Hard\\2-Input.xlsx";
             int numberOfEdges;
             Tuple<string, string, int, int, int>[] edges;
 
@@ -199,7 +205,7 @@ namespace PlagiarismValidation
             }
             return edges;
         }
-
+        
         public static void ConstructingTheGraph(Tuple<string, string, int, int, int>[] edges, Dictionary<string, List<Tuple<string, int, int, int>>> elements, Dictionary<string, int> colored_vertices, ref Dictionary<KeyValuePair<string, string>, Tuple<int, int>> allEdges)
         {
             int maximum = 0;
@@ -282,7 +288,9 @@ namespace PlagiarismValidation
             foreach (Dictionary<KeyValuePair<string, string>, Tuple<int, int>> group in refinedGroups)// number of components
             {
                 //mstSheet.Cells[i + 1, 1].Value = group;
-                foreach (KeyValuePair<string, string> kvp in group.Keys) // E of each refined component
+                Dictionary<KeyValuePair<string, string>, Tuple<int, int>> sorted_group = group.OrderByDescending(pair => pair.Value.Item2).ToDictionary(pair => pair.Key, pair => pair.Value);
+
+                foreach (KeyValuePair<string, string> kvp in sorted_group.Keys) // E of each refined component
                 {
                     KeyValuePair<string, string> kvp2 = new KeyValuePair<string, string>(kvp.Value, kvp.Key);
                     if (allEdges.ContainsKey(kvp))
@@ -292,7 +300,7 @@ namespace PlagiarismValidation
 
                         mstSheet.Cells[i + 1, 1].Value = filePath1;
                         mstSheet.Cells[i + 1, 2].Value = filePath2;
-                        mstSheet.Cells[i + 1, 3].Value = group[kvp].Item2;
+                        mstSheet.Cells[i + 1, 3].Value = sorted_group[kvp].Item2;
                     }
                     else if (allEdges.ContainsKey(kvp2))
                     {
@@ -301,7 +309,7 @@ namespace PlagiarismValidation
 
                         mstSheet.Cells[i + 1, 1].Value = filePath1;
                         mstSheet.Cells[i + 1, 2].Value = filePath2;
-                        mstSheet.Cells[i + 1, 3].Value = group[kvp].Item2;
+                        mstSheet.Cells[i + 1, 3].Value = sorted_group[kvp].Item2;
                     }
                     //mstSheet.Cells[i + 1, 1].Value = group;
                     i++;
@@ -312,7 +320,7 @@ namespace PlagiarismValidation
             string outputFilePath = @"F:\Year 3 2nd term\Analysis and Design of Algorithm\Project\Algorithm-Project\PlagiarismValidation\Output\File2.xlsx";
             excelPackage.SaveAs(new System.IO.FileInfo(outputFilePath));
         }
-        public static void OutPut_Of_Stat(ref Dictionary<string, float> firstVandAvg, ref Dictionary<string, List<string>> componentsLst)
+        public static void OutPut_Of_Stat(ref Dictionary<string, Tuple<float, int>> firstVandAvg, ref Dictionary<string, List<string>> componentsLst)
         {
             ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
             ExcelPackage excelPackage = new ExcelPackage();
@@ -324,19 +332,19 @@ namespace PlagiarismValidation
             statisticsSheet.Cells["C1"].Value = "Average Similarity";
             statisticsSheet.Cells["D1"].Value = "Component Count";
 
-            Dictionary<string, float> sortedFirstVandAvg = firstVandAvg.OrderByDescending(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
+            //Dictionary<string, float> sortedFirstVandAvg = firstVandAvg.OrderByDescending(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
 
             int i = 0;
             int counter = 1;
             // O(Components log(Components) + componentItems Log(componentItems))
 
-            foreach (var vertex in sortedFirstVandAvg) // --> no of component --> worst case V/2 -- Best Case --> 1 time 
+            foreach (var vertex in firstVandAvg) // --> no of component --> worst case V/2 -- Best Case --> 1 time 
             {
                 statisticsSheet.Cells[i + 1, 1].Value = counter;
-                statisticsSheet.Cells[i + 1, 3].Value = vertex.Value;
+                statisticsSheet.Cells[i + 1, 3].Value = vertex.Value.Item1;
                 List<string> component = componentsLst[vertex.Key];
 
-                component.Sort(); // O(vlogv)
+                //component.Sort(); // O(vlogv)
                 // +d
                 List<int> componentItemsList = new List<int>();
                 Regex digitsRegex = new Regex("\\d+");
