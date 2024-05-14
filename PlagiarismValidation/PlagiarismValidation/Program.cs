@@ -1,46 +1,55 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Data;
 using System.IO;
 using ExcelDataReader;
 using System.Text.RegularExpressions;
-using System.ComponentModel;
 using OfficeOpenXml;
-using System.Collections;
-using OfficeOpenXml.Style;
-using OfficeOpenXml.Table;
 using System.Diagnostics;
+
 
 namespace PlagiarismValidation
 {
     class Program
     {
+      
         static void Main(string[] args)
         {
             Stopwatch Program_stopwatch = new Stopwatch();
+            Stopwatch read_excel_stopwatch = new Stopwatch();
+            Stopwatch Constructing_stopwatch = new Stopwatch();
+            Stopwatch bfs_stopwatch = new Stopwatch();
+            Stopwatch Kruskal_stopwatch = new Stopwatch();
+            Stopwatch mst_file_stopwatch = new Stopwatch();
+            Stopwatch stat_file_stopwatch = new Stopwatch();
+
             Program_stopwatch.Start();
 
             Dictionary<string,string> edge_with_its_hyper_link = new Dictionary<string,string>();
-            Tuple<string, string, int, int, int>[] edges = ReadFromExcelFile(ref edge_with_its_hyper_link);
             Dictionary<KeyValuePair<string, string>, Tuple<int, int>> allEdges = new Dictionary<KeyValuePair<string, string>, Tuple<int, int>>();
             Dictionary<string, List<Tuple<string, int, int, int>>> elements = new Dictionary<string, List<Tuple<string, int, int, int>>>(); // edges with two values
             Dictionary<string, int> colored_vertices = new Dictionary<string, int>();//for BFS
             Dictionary<string, List<string>> componentsLst = new Dictionary<string, List<string>>(); //groups
-            // statistics
-            Dictionary<string, Tuple<float,int>> firstVandAvg = new Dictionary<string, Tuple<float, int>>();
+            Dictionary<string, Tuple<float, int>> firstVandAvg = new Dictionary<string, Tuple<float, int>>(); // statistics
             List<Dictionary<KeyValuePair<string, string>, Tuple<int, int>>> Components = new List<Dictionary<KeyValuePair<string, string>, Tuple<int, int>>>();
             List<Dictionary<KeyValuePair<string, string>, Tuple<int, int>>> refinedGroups = new List<Dictionary<KeyValuePair<string, string>, Tuple<int, int>>>();
 
-            ConstructingTheGraph(edges, elements, colored_vertices, ref allEdges);
+            read_excel_stopwatch.Start();
+            Tuple<string, string, int, int, int>[] edges = ReadFromExcelFile(ref edge_with_its_hyper_link);
+            read_excel_stopwatch.Stop();
+            //Console.WriteLine($"Elapsed Time for Reading Excel file: {read_excel_stopwatch.ElapsedMilliseconds}  milliseconds");
 
-            int numberOfEdges = 0;
+            Constructing_stopwatch.Start();
+            ConstructingTheGraph(edges, elements, colored_vertices, ref allEdges);
+            Constructing_stopwatch.Stop();
+            //Console.WriteLine($"Elapsed Time for constructing the graph: {Constructing_stopwatch.ElapsedMilliseconds}  milliseconds");
+
+            int numberOfEdges = 0, list_index = 0;
             float componentAVG = 0;
-            int list_index = 0;
-            Stopwatch bfs_stopwatch = new Stopwatch();
+            
             bfs_stopwatch.Start();
+
             foreach (var vertex in elements) // V  
             {
                 componentAVG = 0;
@@ -58,31 +67,34 @@ namespace PlagiarismValidation
                 }
             }
             bfs_stopwatch.Stop();
-            TimeSpan ts = bfs_stopwatch.Elapsed;
-            double totalSeconds = (ts.TotalHours * 60 * 60) + (ts.TotalMinutes * 60) + ts.TotalSeconds + (ts.TotalMilliseconds / 1000);
-            Console.WriteLine($"Elapsed Time for BFS: {totalSeconds} seconds");
+            //Console.WriteLine($"Elapsed Time for BFS: {bfs_stopwatch.ElapsedMilliseconds} milliseconds");
 
-            firstVandAvg = firstVandAvg.OrderByDescending(pair => pair.Value.Item1).ToDictionary(pair => pair.Key, pair => pair.Value);
-            Stopwatch Kruskal_stopwatch = new Stopwatch();
             Kruskal_stopwatch.Start();
+            firstVandAvg = firstVandAvg.OrderByDescending(pair => pair.Value.Item1).ToDictionary(pair => pair.Key, pair => pair.Value);
+  
             foreach (string firstString in firstVandAvg.Keys)
             {
                 Dictionary<KeyValuePair<string, string>, Tuple<int, int>> refinedcompnent = new Dictionary<KeyValuePair<string, string>, Tuple<int, int>>();
                 Kruskal(Components[firstVandAvg[firstString].Item2], ref refinedcompnent);
                 refinedGroups.Add(refinedcompnent);
             }
-            Kruskal_stopwatch.Stop();
-            TimeSpan kts = Kruskal_stopwatch.Elapsed;
-            double totalSecondsk = (kts.TotalHours * 60 * 60) + (kts.TotalMinutes * 60) + kts.TotalSeconds + (kts.TotalMilliseconds / 1000);
-            Console.WriteLine($"Elapsed Time for Kruskal Algorithm: {totalSecondsk} seconds");
 
-            OutPut_Of_Stat(ref firstVandAvg, ref componentsLst , totalSeconds);
-            OutPut_Of_MST(refinedGroups, ref allEdges , ref edge_with_its_hyper_link , totalSecondsk);
+            Kruskal_stopwatch.Stop();
+            //Console.WriteLine($"Elapsed Time for Kruskal Algorithm: {Kruskal_stopwatch.ElapsedMilliseconds} milliseconds");
+
+            stat_file_stopwatch.Start();
+            OutPut_Of_Stat(ref firstVandAvg, ref componentsLst);
+            stat_file_stopwatch.Stop();
+            Console.WriteLine($"Elapsed Time for calculating and saving statistics file: {stat_file_stopwatch.ElapsedMilliseconds} milliseconds");
+
+            mst_file_stopwatch.Start();
+            OutPut_Of_MST(refinedGroups, ref allEdges , ref edge_with_its_hyper_link);
+            mst_file_stopwatch.Stop();
+            Console.WriteLine($"Elapsed Time for calculating and saving MST  file: {mst_file_stopwatch.ElapsedMilliseconds + Kruskal_stopwatch.ElapsedMilliseconds + bfs_stopwatch.ElapsedMilliseconds + Constructing_stopwatch.ElapsedMilliseconds} milliseconds");
+
 
             Program_stopwatch.Stop();
-            TimeSpan tts = Program_stopwatch.Elapsed;
-            double totalSecondst = (tts.TotalHours * 60 * 60) + (tts.TotalMinutes * 60) + tts.TotalSeconds + (tts.TotalMilliseconds / 1000);
-            Console.WriteLine($"Elapsed Time for the whole program: {totalSecondst} seconds");
+            Console.WriteLine($"Elapsed Time for the whole program: {Program_stopwatch.ElapsedMilliseconds} milliseconds");
         }
 
         public static void BFS(string vertex, ref Dictionary<string, List<Tuple<string, int, int, int>>> graphDictionary, ref Dictionary<string, int> colored_vertices, ref List<string> component, ref int numberOfEdges, ref float componentAVG, ref Dictionary<KeyValuePair<string, string>, Tuple<int, int>> edges_of_components)
@@ -155,10 +167,8 @@ namespace PlagiarismValidation
         }
         public static Tuple<string, string, int, int, int>[] ReadFromExcelFile(ref Dictionary<string, string> edge_with_its_hyper_link)
         {
-            Stopwatch read_excel_stopwatch = new Stopwatch();
-            read_excel_stopwatch.Start();
             //string inputfilePath = "D:\\Uni Related\\Algorithms\\Project\\MATERIALS\\[3] Plagiarism Validation\\Algorithm-Project\\PlagiarismValidation\\Test Cases\\Sample\\6-Input.xlsx";
-            string inputfilePath = "F:\\Year 3 2nd term\\Analysis and Design of Algorithm\\Project\\Algorithm-Project\\PlagiarismValidation\\Test Cases\\Complete\\Hard\\1-Input.xlsx";
+            string inputfilePath = "F:\\Year 3 2nd term\\Analysis and Design of Algorithm\\Project\\Algorithm-Project\\PlagiarismValidation\\Test Cases\\Complete\\Easy\\1-Input.xlsx";
             int numberOfEdges;
             Tuple<string, string, int, int, int>[] edges;
 
@@ -179,7 +189,7 @@ namespace PlagiarismValidation
                 int linesMatched;
 
                 numberOfEdges = table.Rows.Count - 1;
-                //Console.WriteLine(numberOfEdges);
+                
                 edges = new Tuple<string, string, int, int, int>[numberOfEdges];
 
                 for (int i = 1; i < table.Rows.Count; i++)
@@ -237,22 +247,15 @@ namespace PlagiarismValidation
                     }
                 }
             }
-            read_excel_stopwatch.Stop();
-            TimeSpan ts = read_excel_stopwatch.Elapsed;
-            double totalSeconds = (ts.TotalHours * 60 * 60) + (ts.TotalMinutes * 60) + ts.TotalSeconds + (ts.TotalMilliseconds / 1000);
-            Console.WriteLine($"Elapsed Time for Reading Excel file: {totalSeconds} seconds");
             return edges;
         }
         public static void ConstructingTheGraph(Tuple<string, string, int, int, int>[] edges, Dictionary<string, List<Tuple<string, int, int, int>>> elements, Dictionary<string, int> colored_vertices, ref Dictionary<KeyValuePair<string, string>, Tuple<int, int>> allEdges)
         {
-            Stopwatch Constructing_stopwatch = new Stopwatch();
-            Constructing_stopwatch.Start();
-            int maximum = 0;
             //the first float number is for percentage of doc 1 to doc 2 (form the first vertex to the second vertex) (edge item 3)
             //the second float number is for percentage of doc 2 to doc 1 (form the second vertex to the first vertex) (edge item 4)
             foreach (var edge in edges)
             {
-                maximum = Math.Max(edge.Item3, edge.Item4);
+               
                 if (elements.ContainsKey(edge.Item1))
                 {
                     KeyValuePair<string, string> newEdgeToBeAdded = new KeyValuePair<string, string>(edge.Item1, edge.Item2);
@@ -278,10 +281,8 @@ namespace PlagiarismValidation
                 }
 
             }
-            Constructing_stopwatch.Stop();
-            TimeSpan ts = Constructing_stopwatch.Elapsed;
-            double totalSeconds = (ts.TotalHours * 60 * 60) + (ts.TotalMinutes * 60) + ts.TotalSeconds + (ts.TotalMilliseconds / 1000);
-            Console.WriteLine($"Elapsed Time for constructing the graph: {totalSeconds} seconds");
+            
+            
         }
         public static void Kruskal(Dictionary<KeyValuePair<string, string>, Tuple<int, int>> component, ref Dictionary<KeyValuePair<string, string>, Tuple<int, int>> refinedGroups)
         {
@@ -316,10 +317,37 @@ namespace PlagiarismValidation
                 }
             }
         }
-        public static void OutPut_Of_MST(List<Dictionary<KeyValuePair<string, string>, Tuple<int, int>>> refinedGroups, ref Dictionary<KeyValuePair<string, string>, Tuple<int, int>> allEdges , ref Dictionary<string, string> edge_with_its_hyper_link , double timeKruskal)
+        public static void Kruskal_Using_Disjoint_Sets(Dictionary<KeyValuePair<string, string>, Tuple<int, int>> component, ref Dictionary<KeyValuePair<string, string>, Tuple<int, int>> refinedGroups)
         {
-            Stopwatch mst_file_stopwatch = new Stopwatch();
-            mst_file_stopwatch.Start();
+            Dictionary<string, int> enumForVertices = new Dictionary<string, int>();
+            int count = 0;
+            foreach (KeyValuePair<string, string> edge in component.Keys)
+            {
+                if (!enumForVertices.ContainsKey(edge.Key))
+                {
+                    enumForVertices.Add(edge.Key, count);
+                    count++;
+                }
+                if (!enumForVertices.ContainsKey(edge.Value))
+                {
+                    enumForVertices[edge.Value] = count;
+                    count++;
+                }
+            }
+            DisjointsSets set_for_Kruskal = new DisjointsSets(count);
+            Dictionary<KeyValuePair<string, string>, Tuple<int, int>> sortedcomponent = component.OrderByDescending(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
+            foreach (var edge in sortedcomponent)
+            {
+                if (set_for_Kruskal.Find(enumForVertices[edge.Key.Key]) != set_for_Kruskal.Find(enumForVertices[edge.Key.Value]))
+                {
+
+                    refinedGroups[edge.Key] = sortedcomponent[edge.Key];
+                    set_for_Kruskal.Union(enumForVertices[edge.Key.Key], enumForVertices[edge.Key.Value]);
+                }
+            }
+        }
+        public static void OutPut_Of_MST(List<Dictionary<KeyValuePair<string, string>, Tuple<int, int>>> refinedGroups, ref Dictionary<KeyValuePair<string, string>, Tuple<int, int>> allEdges , ref Dictionary<string, string> edge_with_its_hyper_link)
+        {
             ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
             ExcelPackage excelPackage = new ExcelPackage();
 
@@ -378,18 +406,19 @@ namespace PlagiarismValidation
                 
             }
 
-            string outputFilePath = @"F:\Year 3 2nd term\Analysis and Design of Algorithm\Project\Algorithm-Project\PlagiarismValidation\Output\File2.xlsx";
+            mstSheet.Cells[mstSheet.Dimension.Address].AutoFitColumns();
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            string outputFilePath = @"F:\Year 3 2nd term\Analysis and Design of Algorithm\Project\Algorithm-Project\PlagiarismValidation\Output\MSTfile.xlsx";
             excelPackage.SaveAs(new System.IO.FileInfo(outputFilePath));
+            sw.Stop();
+            Console.WriteLine(sw.ElapsedMilliseconds);
 
-            mst_file_stopwatch.Stop();
-            TimeSpan ts = mst_file_stopwatch.Elapsed;
-            double totalSeconds = timeKruskal + (ts.TotalHours * 60 * 60) + (ts.TotalMinutes * 60) + ts.TotalSeconds + (ts.TotalMilliseconds / 1000);
-            Console.WriteLine($"Elapsed Time for calculating and saving MST  file: {totalSeconds} seconds");
         }
-        public static void OutPut_Of_Stat(ref Dictionary<string, Tuple<float, int>> firstVandAvg, ref Dictionary<string, List<string>> componentsLst , double time_BFS)
+        public static void OutPut_Of_Stat(ref Dictionary<string, Tuple<float, int>> firstVandAvg, ref Dictionary<string, List<string>> componentsLst)
         {
-            Stopwatch stat_file_stopwatch = new Stopwatch();
-            stat_file_stopwatch.Start();
+            Stopwatch sw = new Stopwatch();
+          
             ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
             ExcelPackage excelPackage = new ExcelPackage();
 
@@ -400,50 +429,69 @@ namespace PlagiarismValidation
             statisticsSheet.Cells[1,3].Value = "Average Similarity";
             statisticsSheet.Cells[1,4].Value = "Component Count";
 
-            //Dictionary<string, float> sortedFirstVandAvg = firstVandAvg.OrderByDescending(pair => pair.Value).ToDictionary(pair => pair.Key, pair => pair.Value);
-
             int i = 1;
             int counter = 1;
             // O(Components log(Components) + componentItems Log(componentItems))
-
+            
             foreach (var vertex in firstVandAvg) // --> no of component --> worst case V/2 -- Best Case --> 1 time 
             {
                 statisticsSheet.Cells[i + 1, 1].Value = counter;
-                statisticsSheet.Cells[i + 1, 3].Value = vertex.Value.Item1;
+                statisticsSheet.Cells[i + 1, 3].Value = Math.Round(vertex.Value.Item1,1);
                 List<string> component = componentsLst[vertex.Key];
 
-                //component.Sort(); // O(vlogv)
-                // +d
                 List<int> componentItemsList = new List<int>();
                 Regex digitsRegex = new Regex("\\d+");
-                string componentItems = "";
-                // matchPercentage = percentageRegex.Match(column1);
 
+                string componentItems = "";
+             
                 foreach (var item in component) // O(V)
                 {
                     Match digitsRegexMatch = digitsRegex.Match(item);
+                    
+                    /*int indexOfLastBackSlash = item.LastIndexOf('/');
+                    string newitem = item.Remove(indexOfLastBackSlash);
+                    int indexOfSecondLastBackSlash = newitem.LastIndexOf('/');
+                    if(indexOfSecondLastBackSlash == -1)
+                    {
+                        componentItemsList.Add(Convert.ToInt32(newitem));
+                    }
+                    else
+                    {
+                        string id = "";
+                        for (int j = indexOfSecondLastBackSlash + 1; j < newitem.Length; j++)
+                        {
+                            if (newitem[j] >= 48 && newitem[j] <= 57)
+                            {
+                                id += newitem[j];
+                            }
+                        }
+                        componentItemsList.Add(Convert.ToInt32(id));
+                    }*/
                     componentItemsList.Add(Convert.ToInt32(digitsRegexMatch.Value));
                 }
                 componentItemsList.Sort(); // O(vlogv)
+                
                 foreach (var item in componentItemsList) // O(V)
                 {
                     componentItems = componentItems + item.ToString() + ",";
                 }
+
                 componentItems = componentItems.Remove(componentItems.Length - 1);
                 statisticsSheet.Cells[i + 1, 2].Value = componentItems;
                 statisticsSheet.Cells[i + 1, 4].Value = component.Count;
+
                 i++;
                 counter++;
             }
-
+            statisticsSheet.Cells[statisticsSheet.Dimension.Address].AutoFitColumns();
+            sw.Start();
             //string outputFilePath = @"D:\Uni Related\Algorithms\Project\MATERIALS\[3] Plagiarism Validation\Algorithm-Project\PlagiarismValidation\Output\File.xlsx";
-            string outputFilePath = @"F:\Year 3 2nd term\Analysis and Design of Algorithm\Project\Algorithm-Project\PlagiarismValidation\Output\File.xlsx";
+            string outputFilePath = @"F:\Year 3 2nd term\Analysis and Design of Algorithm\Project\Algorithm-Project\PlagiarismValidation\Output\StatisticsFile.xlsx";
             excelPackage.SaveAs(new System.IO.FileInfo(outputFilePath));
             
-            stat_file_stopwatch.Stop();
-            TimeSpan ts = stat_file_stopwatch.Elapsed;
-            double totalSeconds = time_BFS + (ts.TotalHours * 60 * 60) + (ts.TotalMinutes * 60) + ts.TotalSeconds + (ts.TotalMilliseconds / 1000);
-            Console.WriteLine($"Elapsed Time for calculating and saving statistics file: {totalSeconds} seconds");
+            sw.Stop();
+            Console.WriteLine(sw.ElapsedMilliseconds);
+           
         }
     }
 }
