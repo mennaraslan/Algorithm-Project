@@ -82,15 +82,15 @@ namespace PlagiarismValidation
             Kruskal_stopwatch.Stop();
             //Console.WriteLine($"Elapsed Time for Kruskal Algorithm: {Kruskal_stopwatch.ElapsedMilliseconds} milliseconds");
 
-            stat_file_stopwatch.Start();
-            OutPut_Of_Stat(ref firstVandAvg, ref componentsLst);
-            stat_file_stopwatch.Stop();
-            Console.WriteLine($"Elapsed Time for calculating and saving statistics file: {stat_file_stopwatch.ElapsedMilliseconds} milliseconds");
-
             mst_file_stopwatch.Start();
             OutPut_Of_MST(refinedGroups, ref allEdges , ref edge_with_its_hyper_link);
             mst_file_stopwatch.Stop();
             Console.WriteLine($"Elapsed Time for calculating and saving MST  file: {mst_file_stopwatch.ElapsedMilliseconds + Kruskal_stopwatch.ElapsedMilliseconds + bfs_stopwatch.ElapsedMilliseconds + Constructing_stopwatch.ElapsedMilliseconds} milliseconds");
+
+            stat_file_stopwatch.Start();
+            OutPut_Of_Stat(ref firstVandAvg, ref componentsLst);
+            stat_file_stopwatch.Stop();
+            Console.WriteLine($"Elapsed Time for calculating and saving statistics file: {stat_file_stopwatch.ElapsedMilliseconds} milliseconds");
 
 
             Program_stopwatch.Stop();
@@ -485,10 +485,8 @@ namespace PlagiarismValidation
             }
             statisticsSheet.Cells[statisticsSheet.Dimension.Address].AutoFitColumns();
             sw.Start();
-            //string outputFilePath = @"D:\Uni Related\Algorithms\Project\MATERIALS\[3] Plagiarism Validation\Algorithm-Project\PlagiarismValidation\Output\File.xlsx";
             string outputFilePath = @"F:\Year 3 2nd term\Analysis and Design of Algorithm\Project\Algorithm-Project\PlagiarismValidation\Output\StatisticsFile.xlsx";
             excelPackage.SaveAs(new System.IO.FileInfo(outputFilePath));
-            
             sw.Stop();
             Console.WriteLine(sw.ElapsedMilliseconds);
            
